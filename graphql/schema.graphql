@@ -1,0 +1,44 @@
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+type Query {
+    # users: [User!]! @paginate(defaultCount: 10)
+    # user(id: ID @eq): User @find
+    users_paginated: [User !]! @paginate(defaultCount: 10)
+    users: [User!]! @all
+    user(id: ID! @eq): User @find
+    userByEmail(email: String!): User! @field(resolver: "UserQuery@findByEmail")
+    # jobs(page: Int =1, count: Int = 15 ): [Job!]! @field(resolver: "JobQuery@paginate")
+    # or
+    jobs: [Jobs!]! @paginate
+}
+
+type Mutation{
+    createUser(
+        name: String! 
+        email: String!
+        password: String!
+    ): User @field(resolver: "UserMutation@saveUser")
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    password: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    # jobs: [Job!]! @field(resolver: "App\\Graphql\\Types\\UserTypes@jobs")
+    # or 
+    jobs: [Jobs!]! @hasMany
+}
+
+
+type Jobs{
+    id: ID!
+    job_name: String!
+    user: User @belongsTo
+}
